@@ -4,6 +4,7 @@ import dev.hiwa.iticket.domain.dto.request.PurchaseTicketRequest;
 import dev.hiwa.iticket.domain.dto.response.GetAllTickets_TicketResponse;
 import dev.hiwa.iticket.domain.dto.response.GetTicketForUser_TicketResponse;
 import dev.hiwa.iticket.domain.dto.response.PurchaseTicketResponse;
+import dev.hiwa.iticket.domain.entities.Event;
 import dev.hiwa.iticket.domain.entities.Ticket;
 import dev.hiwa.iticket.domain.entities.TicketType;
 import dev.hiwa.iticket.domain.entities.User;
@@ -32,7 +33,6 @@ public class TicketService {
 
     private final TicketMapper ticketMapper;
 
-
     private final QrCodeService qrCodeService;
 
     @Transactional
@@ -45,14 +45,11 @@ public class TicketService {
         TicketType ticketType = ticketTypeRepository
                 .findByIdWithLock(request.getTicketTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("TicketType",
-                                                                 "id",
-                                                                 request.getTicketTypeId().toString()
-                ));
+                        "id",
+                        request.getTicketTypeId().toString()));
 
-        int purchasedTicketsCount =
-                ticketRepository.countByTicketStatusAndTicketType_Id(TicketStatus.PURCHASED,
-                                                                     request.getTicketTypeId()
-                );
+        int purchasedTicketsCount = ticketRepository.countByTicketStatusAndTicketType_Id(TicketStatus.PURCHASED,
+                request.getTicketTypeId());
         if (ticketType.getTotalAvailable() - purchasedTicketsCount <= 0) {
             throw new TicketSoldOutException();
         }
@@ -62,6 +59,19 @@ public class TicketService {
         ticket.setTicketType(ticketType);
         ticket.setTicketStatus(TicketStatus.PURCHASED);
 
+        // Add event to user's attendingEvents
+        Event event = ticketType.getEvent();
+        user.getAttendingEvents().size(); // Forces initialization
+        if (!user.getAttendingEvents().contains(event)) {
+            user.getAttendingEvents().add(event);
+            userRepository.save(user);
+            userRepository.flush();
+        }
+
+        // Save user to update attendingEvents
+        userRepository.save(user);
+        userRepository.flush();
+
         Ticket savedTicket = ticketRepository.save(ticket);
 
         var qr = qrCodeService.generateQrCodeFor(savedTicket);
@@ -70,11 +80,9 @@ public class TicketService {
         return ticketMapper.toPurchaseTicketResponse(ticketRepository.save(savedTicket));
     }
 
-
     @Transactional(readOnly = true)
     public Page<GetAllTickets_TicketResponse> getAllUserTickets(
-            UUID userId, Integer page, Integer size
-    ) {
+            UUID userId, Integer page, Integer size) {
         var pageRequest = PageRequest.of(page, size);
 
         Page<Ticket> userTickets = ticketRepository.findAllByBuyer_Id(userId, pageRequest);

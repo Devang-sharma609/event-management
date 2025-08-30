@@ -4,6 +4,7 @@ import dev.hiwa.iticket.filters.UserProvisioningFilter;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,7 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +31,9 @@ public class SecurityConfig {
         private static final String JWK_SET_URI = "https://sgwkisydeybuvgbsxxsp.supabase.co/auth/v1/.well-known/jwks.json";
         private static final String ISSUER = "https://sgwkisydeybuvgbsxxsp.supabase.co/auth/v1";
 
+        @Autowired
+        CorsConfigurationSource corsConfigurationSource;
+
         @Bean
         public SecurityFilterChain filterChain(
                         HttpSecurity http,
@@ -36,9 +41,11 @@ public class SecurityConfig {
                         JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
                 http
                                 .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authorize -> authorize
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 .requestMatchers("/swagger-ui/**").permitAll()
                                                 .requestMatchers("/swagger-ui.html").permitAll()
                                                 .requestMatchers("/v3/api-docs/**").permitAll()
@@ -70,5 +77,18 @@ public class SecurityConfig {
 
                 decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator));
                 return decoder;
+        }
+
+        @Bean
+        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+                org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
+                configuration.setAllowedOrigins(List.of("*"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("*"));
+                configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
+                configuration.setAllowCredentials(false);
+                org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
         }
 }
