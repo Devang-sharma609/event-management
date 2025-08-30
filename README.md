@@ -81,9 +81,9 @@ headers:
 ```.env
 spring.application.name=iTicket
 # Data Base
-spring.datasource.url=jdbc:postgresql://db.sgwkisydeybuvgbsxxsp.supabase.co:5432/postgres
+spring.datasource.url=jdbc:postgresql://db.<SUPABSE_PROJECT_REF>.supabase.co:5432/postgres
 spring.datasource.username=postgres
-spring.datasource.password=8zJqmPng7CNgM8Qw
+spring.datasource.password=DB_PSWD
 spring.datasource.driver-class-name=org.postgresql.Driver
 # JPA
 spring.jpa.hibernate.ddl-auto=update
