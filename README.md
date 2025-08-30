@@ -1,23 +1,26 @@
 # 🪪 iTicket — Spring Boot Event Ticketing Platform API
 
-An Event Ticketing REST API built with Spring Boot, Keycloak, and Spring Security.  
+An Event Ticketing REST API built with Spring Boot, Supabase(as DB and AuthProvider), and Spring Security.
 It supports event publishing, ticket purchasing, QR code generation, and validation — all accessible via Swagger UI.
-> 📌 **Note**: This project is based on a solution originally developed by [Devtiro](https://www.youtube.com/@devtiro). I've implemented my own version with some changes and improvements.
+
+> 📌 This project is based on a solution originally developed by [Devtiro](https://www.youtube.com/@devtiro). I've implemented my own version with some changes and improvements.
+
 ---
 
 ## 🚀 Features
 
-- 🎟️ Event and Ticket Management  
+- 🎟️ Event and Ticket Management
 - 🛒 Purchase tickets
-- 🔐 Role-based access control (Attendee, Organizer, Staff) via Keycloak  
-- 📲 QR Code generation for purchased tickets  
-- ✅ Validate ticket entry using QR codes  
-- 📦 DTO-based API layer  
-- 📖 API documentation with Swagger UI  
+- 🔐 Role-based access control (Attendee, Organizer, Staff) via Supabase
+- 📲 QR Code generation for purchased tickets
+- ✅ Validate ticket entry using QR codes
+- 📦 DTO-based API layer
+- 📖 API documentation with Swagger UI
 
 ---
 
 ## 📂 Project Structure
+
 ```bash
 ├── config/
 ├── controller/
@@ -36,7 +39,59 @@ It supports event publishing, ticket purchasing, QR code generation, and validat
 
 ## 📸 API Preview
 
-Here are the screenshots from the Swagger UI for quick reference:
+After starting backend go to http://localhost:8080/swagger-ui/index.html
 
-<img width="1820" height="569" alt="1" src="https://github.com/user-attachments/assets/5d84063e-fde9-423e-a9e9-ec90ac2fe8f8" />
-<img width="1833" height="489" alt="2" src="https://github.com/user-attachments/assets/65b66994-b3b6-4367-b21d-51566b6b6056" />
+SupabaseAuth API Structure:
+
+#### POST https://<PROJECT_REF>.supabase.co/auth/v1/token?grant_type=password
+
+```json
+headers:
+"apikey":"SUPABSE_ANON_KEY"
+"Content-Type": "application/json"
+{
+  "email": "mike.organizer@gmail.com",
+  "password": "Organizer@123"
+}
+```
+
+#### POST https://<PROJECT_REF>.supabase.co/auth/v1/signup
+```json
+headers:
+"apikey":"SUPABSE_ANON_KEY",
+"Content-Type": "application/json"
+{
+  "email": "mike.organizer@gmail.com",
+  "password": "Organizer@123",
+    "data"{
+      "name": "Mike Brown",
+      "role": "organizer"
+  }
+}
+```
+
+#### POST https://<PROJECT_REF>.supabase.co/auth/v1/logout
+```json
+headers:
+"apikey":"SUPABSE_ANON_KEY",
+"Authorization": "Bearer ${access_token}"
+```
+
+#### application.properties structure
+```.env
+spring.application.name=iTicket
+# Data Base
+spring.datasource.url=jdbc:postgresql://db.sgwkisydeybuvgbsxxsp.supabase.co:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=8zJqmPng7CNgM8Qw
+spring.datasource.driver-class-name=org.postgresql.Driver
+# JPA
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+springdoc.swagger-ui.oauth.client-id=swagger-client
+
+logging.level.web=DEBUG
+logging.level.org.springframework.security=DEBUG
+```
