@@ -45,7 +45,7 @@ public class EventController {
             @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(name = "size", required = false, defaultValue = "25") Integer size) {
         UUID userId = UUID.fromString(jwt.getSubject());
-        var eventsPage = eventService.getAllEventsForOrganizer(userId, page, size);
+        Page<EventResponse> eventsPage = eventService.getAllEventsForOrganizer(userId, page, size);
 
         return ResponseEntity.ok(eventsPage);
     }

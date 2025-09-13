@@ -50,7 +50,7 @@ headers:
 
 JSONBody:
 {
-  "email": "mike.organizer@gmail.com",
+  "email": "user.organizer@gmail.com",
   "password": "Organizer@123"
 }
 ```
@@ -97,6 +97,7 @@ headers:
    {
    "name": "Spring Fest",
    "venue": "Main Hall",
+   "description" : "Ghatiya event ekdum",
    "starts_at": "2024-09-01T10:00:00",
    "ends_at": "2024-09-01T18:00:00",
    "sales_starts_at": "2024-08-01T00:00:00",
@@ -113,7 +114,7 @@ headers:
    }
    ```
 
-2. **GET /api/v1/events**  
+2. **GET /api/v1/events?page=${page}&size=${size}**  
 Description: Get all events for the authenticated organizer (paginated)  
 Access: **ORGANIZER**  
 Query Params:  
@@ -131,6 +132,7 @@ Query Params:
    {
    "name": "Spring Fest Updated",
    "venue": "Main Hall",
+   "description" : "accha event h",
    "starts_at": "2024-09-01T10:00:00",
    "ends_at": "2024-09-01T18:00:00",
    "sales_starts_at": "2024-08-01T00:00:00",
@@ -138,7 +140,7 @@ Query Params:
    "event_status": "PUBLISHED",
    "ticket_types": [
     {
-      "id": "TICKET_TYPE_UUID",
+      "ticket_type_id": "TICKET_TYPE_UUID",
       "name": "VIP",
       "price": 120.0,
       "totalAvailable": 60
@@ -152,7 +154,7 @@ Query Params:
    Access: **ORGANIZER**  
 
 7. **POST /api/v1/events/{eventId}/staff**  
-Description: Assign staff to an event  
+Description: Assign staff to an event
 Access: **ORGANIZER**  
 Request Body:  
 

@@ -31,6 +31,7 @@ public class TicketType {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "description", nullable = true, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)

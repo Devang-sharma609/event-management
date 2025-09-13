@@ -18,8 +18,10 @@ import dev.hiwa.iticket.repository.EventRepository;
 import dev.hiwa.iticket.repository.TicketTypeRepository;
 import dev.hiwa.iticket.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +76,7 @@ public class EventService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "No such Event with id '%s' exists for Organizer with id '%s'"
                                                                 .formatted(eventId,
-                                                                                organizerId)));
+                                                                                organizerId), HttpStatus.NOT_FOUND));
 
                 return eventMapper.toEventResponse(event);
 
@@ -87,8 +89,7 @@ public class EventService {
                                 .findByIdAndOrganizer_Id(eventId, organizerId)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 "No such Event with id '%s' exists for Organizer with id '%s'"
-                                                                .formatted(eventId,
-                                                                                organizerId)));
+                                                                .formatted(eventId, organizerId), HttpStatus.NOT_FOUND));
 
                 // Step 2: Extract TicketType IDs
                 Set<UUID> incomingTicketTypeIds = request
@@ -105,7 +106,7 @@ public class EventService {
                         Set<UUID> missingIds = new HashSet<>(incomingTicketTypeIds);
                         missingIds.removeAll(foundIds);
 
-                        throw new ResourceNotFoundException("TicketType(s) not found for ID(s): " + missingIds);
+                        throw new ResourceNotFoundException("TicketType(s) not found for ID(s): " + missingIds, HttpStatus.NOT_FOUND);
                 }
 
                 // Step 3: Map TicketType entities by ID
@@ -127,7 +128,7 @@ public class EventService {
                                                 "TicketType with ID '%s' does not belong to Event with ID '%s'"
                                                                 .formatted(
                                                                                 ticketTypeId,
-                                                                                eventId));
+                                                                                eventId),HttpStatus.CONFLICT);
                         }
 
                         ticketTypeMapper.update(ticketType, ticketReq);
@@ -180,14 +181,13 @@ public class EventService {
         @Transactional
         public void assignStaffToEvent(UUID eventId, List<UUID> userIds) {
                 Event event = eventRepository.findById(eventId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("Event not found", HttpStatus.NOT_FOUND));
                 for (UUID userId : userIds) {
                         User user = userRepository.findById(userId)
-                                        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                                        .orElseThrow(() -> new ResourceNotFoundException("Event not found", HttpStatus.NOT_FOUND));
                         if (!event.getStaff().contains(user)) {
                                 event.getStaff().add(user);
                                 user.getStaffingEvents().add(event); // bidirectional
-                                userRepository.save(user); // bidirectional
                         }
                 }
                 eventRepository.save(event);
@@ -196,7 +196,7 @@ public class EventService {
         @Transactional
         public List<UUID> getAssignedStaff(UUID eventId) {
                 Event event = eventRepository.findById(eventId)
-                                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+                                .orElseThrow(() -> new ResourceNotFoundException("Event not found", HttpStatus.NOT_FOUND));
                 return event.getStaff().stream()
                                 .map(User::getId)
                                 .collect(Collectors.toList());

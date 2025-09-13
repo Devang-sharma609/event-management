@@ -5,6 +5,9 @@ import dev.hiwa.iticket.domain.dto.response.TicketValidationResponse;
 import dev.hiwa.iticket.service.TicketValidationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -25,6 +28,7 @@ public class TicketValidationController {
     public ResponseEntity<TicketValidationResponse> validateTicket(
             @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody TicketValidationRequest request
     ) {
-        return ResponseEntity.ok(ticketValidationService.validateTicket(request));
+        UUID staffId = UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(ticketValidationService.validateTicket(request, staffId));
     }
 }

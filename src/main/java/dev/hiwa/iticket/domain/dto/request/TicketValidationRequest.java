@@ -8,13 +8,18 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TicketValidationRequest {
+
+    @JsonProperty(value = "targetId")
     @NotNull
     private UUID targetId;
 
+    @JsonProperty(value = "method")
     @NotNull
     private TicketValidationMethod method;
 }

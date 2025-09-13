@@ -14,6 +14,8 @@ import dev.hiwa.iticket.mappers.QrCodeMapper;
 import dev.hiwa.iticket.repository.QrCodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -57,13 +59,13 @@ public class QrCodeService {
     public byte[] getQrCodeImageForTicket(UUID userId, UUID ticketId) {
         QrCode qrCode = qrCodeRepository
                 .findByTicket_IdAndTicket_Buyer_Id(ticketId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("QR Code Not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("QR Code Not found", HttpStatus.NOT_FOUND));
 
         try {
             return Base64.getDecoder().decode(qrCode.getValue());
         } catch (IllegalArgumentException ex) {
             log.error("Invalid base64 QR Code for ticket ID: {}", ticketId, ex);
-            throw new ResourceNotFoundException("QR Code Not found");
+            throw new IllegalArgumentException("Invalid base64 QR Code for ticket ID: " + ticketId, ex);
         }
 
     }

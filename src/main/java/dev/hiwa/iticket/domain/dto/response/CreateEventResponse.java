@@ -8,20 +8,44 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateEventResponse {
 
+    @JsonProperty("event_id")
     private UUID id;
+
+    @JsonProperty("name")
     private String name;
-    private LocalDateTime startsAt;
-    private LocalDateTime endsAt;
+
+    @JsonProperty("description")
+    private String description;
+
+    @JsonProperty("venue")
     private String venue;
-    private LocalDateTime salesStartsAt;
-    private LocalDateTime salesEndsAt;
+
+    @JsonProperty("event_status")
     private EventStatus eventStatus;
+
+    @JsonProperty("starts_at")
+    private LocalDateTime startsAt;
+
+    @JsonProperty("ends_at")
+    private LocalDateTime endsAt;
+
+    @JsonProperty("sales_starts_at")
+    private LocalDateTime salesStartsAt;
+
+    @JsonProperty("sales_ends_at")
+    private LocalDateTime salesEndsAt;
+
+    @JsonProperty("created_at")
     private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
     private LocalDateTime updatedAt;
 }

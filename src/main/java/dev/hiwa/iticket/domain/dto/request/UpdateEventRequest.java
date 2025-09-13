@@ -19,11 +19,16 @@ import java.util.List;
 @NoArgsConstructor
 public class UpdateEventRequest {
 
+    @JsonProperty(value = "name")
     @NotBlank
     private String name;
 
+    @JsonProperty(value = "venue")
     @NotBlank
     private String venue;
+
+    @JsonProperty(value = "description")
+    private String description;
 
     @JsonProperty(value = "starts_at")
     @NotNull

@@ -1,5 +1,6 @@
 package dev.hiwa.iticket.exceptions;
 
+import org.springframework.http.HttpStatus;
 
 public class ResourceNotFoundException extends RuntimeException {
 
@@ -17,7 +18,7 @@ public class ResourceNotFoundException extends RuntimeException {
         this.fieldName = fieldName;
     }
 
-    public ResourceNotFoundException(String message) {
+    public ResourceNotFoundException(String message, HttpStatus forbidden) {
         super(message);
     }
 }

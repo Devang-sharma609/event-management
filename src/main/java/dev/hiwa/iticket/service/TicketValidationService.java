@@ -10,12 +10,16 @@ import dev.hiwa.iticket.domain.enums.TicketValidationMethod;
 import dev.hiwa.iticket.domain.enums.TicketValidationStatus;
 import dev.hiwa.iticket.exceptions.ResourceNotFoundException;
 import dev.hiwa.iticket.mappers.TicketValidationMapper;
+import dev.hiwa.iticket.repository.EventRepository;
 import dev.hiwa.iticket.repository.QrCodeRepository;
 import dev.hiwa.iticket.repository.TicketRepository;
 import dev.hiwa.iticket.repository.TicketValidationRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,11 +31,11 @@ public class TicketValidationService {
     private final TicketValidationRepository ticketValidationRepository;
     private final QrCodeRepository qrCodeRepository;
     private final TicketRepository ticketRepository;
-
     private final TicketValidationMapper ticketValidationMapper;
+    private final EventRepository eventRepository;
 
     @Transactional
-    public TicketValidationResponse validateTicket(TicketValidationRequest request) {
+    public TicketValidationResponse validateTicket(TicketValidationRequest request, UUID staffId) {
         return switch (request.getMethod()) {
             case QR_SCAN -> {
                 UUID qrCodeId = request.getTargetId();
@@ -40,11 +44,11 @@ public class TicketValidationService {
                         .findByIdAndStatus(qrCodeId, QrCodeStatus.ACTIVE)
                         .orElseThrow(() -> {
                             var msg = String.format("No active QR Code found with ID: %s", qrCodeId);
-                            return new ResourceNotFoundException(msg);
+                            return new ResourceNotFoundException(msg, HttpStatus.NOT_FOUND);
                         });
 
                 Ticket ticket = qrCode.getTicket();
-                yield _validate(ticket, TicketValidationMethod.QR_SCAN);
+                yield _validate(ticket, staffId, TicketValidationMethod.QR_SCAN);
             }
             case MANUAL -> {
                 UUID ticketId = request.getTargetId();
@@ -55,12 +59,17 @@ public class TicketValidationService {
                                 "id",
                                 ticketId.toString()));
 
-                yield _validate(ticket, TicketValidationMethod.MANUAL);
+                yield _validate(ticket, staffId, TicketValidationMethod.MANUAL);
             }
         };
     }
 
-    private TicketValidationResponse _validate(Ticket ticket, TicketValidationMethod method) {
+    private TicketValidationResponse _validate(Ticket ticket, UUID staffId, TicketValidationMethod method) {
+
+         if (!isStaffAssignedToEvent(staffId, ticket.getTicketType().getEvent().getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         TicketValidation ticketValidation = new TicketValidation();
         ticketValidation.setValidationMethod(method);
         ticketValidation.setTicket(ticket);
@@ -87,5 +96,9 @@ public class TicketValidationService {
 
             return ticketValidationMapper.toTicketValidationResponse(savedValidation);
         }
+    }
+
+    private boolean isStaffAssignedToEvent(UUID staffId, UUID eventId) {
+        return eventRepository.existsByIdAndAssignedStaffId(eventId, staffId);
     }
 }

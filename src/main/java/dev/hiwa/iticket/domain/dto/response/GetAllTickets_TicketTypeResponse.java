@@ -6,13 +6,20 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class GetAllTickets_TicketTypeResponse {
 
+    @JsonProperty("ticket_type_id")
     private UUID id;
+
+    @JsonProperty("name")
     private String name;
+
+    @JsonProperty("price")
     private Double price;
 
 }

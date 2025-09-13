@@ -41,6 +41,9 @@ public class Event {
     @Column(nullable = false)
     private String venue;
 
+    @Column(name="description", columnDefinition = "TEXT", nullable = true)
+    private String description;
+
     @Column(name = "sales_starts_at")
     private LocalDateTime salesStartsAt;
 
