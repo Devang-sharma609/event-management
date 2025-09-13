@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RequiredArgsConstructor
 @RestController
@@ -104,6 +107,11 @@ public class EventController {
 
         List<UUID> assignedUserIds = eventService.getAssignedStaff(eventId);
 
-        return new ResponseEntity<>(assignedUserIds, HttpStatus.CREATED);
+        return ResponseEntity.ok(assignedUserIds);
+    }
+
+    @GetMapping("/{eventId}/staff")
+    public ResponseEntity<?> getAssignedStaff(@PathVariable("eventId") UUID eventId) {
+        return ResponseEntity.ok(eventService.getAssignedStaff(eventId));
     }
 }
