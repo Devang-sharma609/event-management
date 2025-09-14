@@ -153,6 +153,8 @@ Query Params:
    Description: Delete an event  
    Access: **ORGANIZER**  
 
+6. **GET /api/v1/events/{eventId}/staff**  
+
 7. **POST /api/v1/events/{eventId}/staff**  
 Description: Assign staff to an event
 Access: **ORGANIZER**  
