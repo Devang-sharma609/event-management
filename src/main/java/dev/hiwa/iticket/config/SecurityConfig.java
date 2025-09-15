@@ -23,20 +23,22 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
         @Value("${jwk.set.uri}")
-        private  String JWK_SET_URI;
-        
+        private String JWK_SET_URI;
+
         @Value("${jwt.issuer}")
         private String ISSUER;
 
-        @Autowired
-        CorsConfigurationSource corsConfigurationSource;
+        @Value("${cors.allowed-origins}")
+        private String allowedOrigins;
 
         @Autowired
         UserProvisioningFilter userProvisioningFilter;
@@ -48,19 +50,19 @@ public class SecurityConfig {
                         JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
                 http
                                 .csrf(AbstractHttpConfigurer::disable)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers("/actuator/health").permitAll()
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                                .requestMatchers("/swagger-ui/**").permitAll()
                                                 .requestMatchers("/swagger-ui.html").permitAll()
-                                                .requestMatchers("/v3/api-docs/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/events/published/**")
                                                 .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/events/{eventId}/staff").hasRole("ORGANIZER")
-                                                .requestMatchers(HttpMethod.POST, "/api/v1/events/{eventId}/staff").hasRole("ORGANIZER")
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/events/{eventId}/staff")
+                                                .hasRole("ORGANIZER")
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/events/{eventId}/staff")
+                                                .hasRole("ORGANIZER")
                                                 .requestMatchers("/api/v1/events/**").hasRole("ORGANIZER")
                                                 .requestMatchers("/api/v1/tickets/**").hasRole("ATTENDEE")
                                                 .requestMatchers("/api/v1/ticket-validations/**").hasRole("STAFF")
@@ -91,14 +93,15 @@ public class SecurityConfig {
         }
 
         @Bean
-        public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
-                org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
-                configuration.setAllowedOriginPatterns(List.of("http://localhost:5173", "http://localhost:3000"));
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(List.of("*"));
                 configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
                 configuration.setAllowCredentials(true);
-                org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
                 source.registerCorsConfiguration("/**", configuration);
                 return source;
         }
