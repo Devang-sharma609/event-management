@@ -50,8 +50,8 @@ public class SecurityConfig {
                         JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
                 http
                                 .csrf(AbstractHttpConfigurer::disable)
-                                // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                                .cors(cors->cors.disable())
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                // .cors(cors->cors.disable())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authorize -> authorize
