@@ -50,7 +50,7 @@ public class SecurityConfig {
                         JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
                 http
                                 .csrf(AbstractHttpConfigurer::disable)
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .cors(cors -> cors.configure(http))
                                 // .cors(cors->cors.disable())
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -96,10 +96,10 @@ public class SecurityConfig {
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
-                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedOrigins(List.of("*"));
+                configuration.setAllowedMethods(List.of("*"));
                 configuration.setAllowedHeaders(List.of("*"));
-                configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
+                configuration.setExposedHeaders(List.of("*"));
                 configuration.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
