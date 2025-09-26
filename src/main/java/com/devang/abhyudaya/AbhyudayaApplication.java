@@ -14,19 +14,20 @@ import java.util.TimeZone;
 public class AbhyudayaApplication {
 
 	public static void main(String[] args) {
-		// Load .env file if it exists
+		// Load .env file if it exists and set system properties before Spring Boot starts
 		Dotenv dotenv = Dotenv.configure()
 			.directory(".")
 			.ignoreIfMissing()
 			.load();
 		
-		// Set environment variables as system properties
+		// Set all environment variables as system properties
 		dotenv.entries().forEach(entry -> 
 			System.setProperty(entry.getKey(), entry.getValue())
 		);
 		
 		// Set the default timezone to UTC to prevent PostgreSQL timezone issues
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+		
 		SpringApplication.run(AbhyudayaApplication.class, args);
 	}
 

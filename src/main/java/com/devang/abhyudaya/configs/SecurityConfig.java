@@ -51,6 +51,7 @@ public class SecurityConfig {
                                                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                                 .authorizeHttpRequests(authorize -> authorize
                                                 // Public endpoints (most specific first)
+                                                .requestMatchers("/health").permitAll()
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/events/published").permitAll() //browse all published events
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/events/published/{id}").permitAll() //get particular published event
