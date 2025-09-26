@@ -1,19 +1,32 @@
-{
-    "properties": [
-        {
-            "name": "cors.allowed-origins",
-            "type": "java.lang.String",
-            "description": "A description for 'cors.allowed-origins'"
-        },
-        {
-            "name": "jwt.issuer",
-            "type": "java.lang.String",
-            "description": "A description for 'jwt.issuer'"
-        },
-        {
-            "name": "jwk.set.uri",
-            "type": "java.lang.String",
-            "description": "A description for 'jwk.set.uri'"
-        }
-    ]
-}
+{"properties": [
+  {
+    "name": "cors.allowed-origins",
+    "type": "java.lang.String",
+    "description": "A description for 'cors.allowed-origins'"
+  },
+  {
+    "name": "jwt.issuer",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.issuer'"
+  },
+  {
+    "name": "jwk.set.uri",
+    "type": "java.lang.String",
+    "description": "A description for 'jwk.set.uri'"
+  },
+  {
+    "name": "keep-alive.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'keep-alive.enabled'"
+  },
+  {
+    "name": "keep-alive.interval",
+    "type": "java.lang.String",
+    "description": "A description for 'keep-alive.interval'"
+  },
+  {
+    "name": "app.backend.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'app.backend.base-url'"
+  }
+]}
